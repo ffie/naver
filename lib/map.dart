@@ -5,14 +5,14 @@ import 'package:naver_map_plugin/naver_map_plugin.dart';
 
 import 'dart:async';
 
-class Map extends StatefulWidget {
-  const Map({Key? key}) : super(key: key);
+class Map3 extends StatefulWidget {
+  const Map3({Key? key}) : super(key: key);
 
   @override
-  State<Map> createState() => _MapState();
+  State<Map3> createState() => _MapState();
 }
 
-class _MapState extends State<Map> {
+class _MapState extends State<Map3> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   static const MODE_ADD = 0xF1;
   static const MODE_REMOVE = 0xF2;
@@ -181,14 +181,14 @@ class _MapState extends State<Map> {
     _controller.complete(controller);
   }
 
-  void _onMarkerTap(Marker marker) {
-    int pos = _markers.indexWhere((m) => m.markerId == marker.markerId);
+  void _onMarkerTap(Marker? marker, Map<String, int?> dd) {
+    int pos = _markers.indexWhere((m) => m.markerId == marker!.markerId);
     setState(() {
       _markers[pos].captionText = '선택됨';
     });
     if (_currentMode == MODE_REMOVE) {
       setState(() {
-        _markers.removeWhere((m) => m.markerId == marker.markerId);
+        _markers.removeWhere((m) => m.markerId == marker!.markerId);
       });
     }
   }

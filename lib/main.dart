@@ -72,7 +72,7 @@ class _LoginState extends State<Login> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                Map()));
+                                                Map3()));
                                   },
                                   child: Icon(
                                     Icons.arrow_forward,
