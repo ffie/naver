@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, import_of_legacy_library_into_null_safe, avoid_print
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:naver_map_plugin/naver_map_plugin.dart';
 
@@ -17,10 +18,19 @@ class _MapState extends State<Map3> {
   static const MODE_ADD = 0xF1;
   static const MODE_REMOVE = 0xF2;
   static const MODE_NONE = 0xF3;
+  static const MODE_MODIFY = 0xF4;
   int _currentMode = MODE_NONE;
+
+  final _textMap = TextEditingController();
 
   Completer<NaverMapController> _controller = Completer();
   List<Marker> _markers = [];
+
+  @override
+  void dispose() {
+    _textMap.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -29,6 +39,7 @@ class _MapState extends State<Map3> {
         assetName: 'icon/marker.png',
       ).then((image) {
         setState(() {
+          print("test1");
           _markers.add(Marker(
               markerId: 'id',
               position: LatLng(37.489488, 126.724519),
@@ -60,6 +71,7 @@ class _MapState extends State<Map3> {
           children: <Widget>[
             _naverMap(),
             _controlPanel(),
+            _textFieldView(),
           ],
         ),
       ),
@@ -126,6 +138,33 @@ class _MapState extends State<Map3> {
             ),
           ),
 
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _currentMode = MODE_MODIFY),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: _currentMode == MODE_MODIFY
+                        ? Colors.black
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.black)),
+                padding: EdgeInsets.all(8),
+                margin: EdgeInsets.only(right: 8),
+                child: Text(
+                  '수정',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _currentMode == MODE_MODIFY
+                        ? Colors.white
+                        : Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           // none
           GestureDetector(
             onTap: () => setState(() => _currentMode = MODE_NONE),
@@ -162,12 +201,34 @@ class _MapState extends State<Map3> {
     );
   }
 
+  _textFieldView() => Align(
+        alignment: Alignment.topCenter,
+        child: SafeArea(
+          bottom: false,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(50),
+            ),
+            margin: EdgeInsets.all(24),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: CupertinoTextField(
+              controller: _textMap,
+              maxLines: 1,
+              onChanged: (text) {
+                print(text);
+              },
+            ),
+          ),
+        ),
+      );
+
   void _onMapTap(LatLng latLng) {
     if (_currentMode == MODE_ADD) {
       _markers.add(Marker(
         markerId: DateTime.now().toIso8601String(),
         position: latLng,
-        infoWindow: '테스트',
+        infoWindow: "정보를 입력하세요",
         onMarkerTab: _onMarkerTap,
       ));
       setState(() {});
@@ -185,10 +246,16 @@ class _MapState extends State<Map3> {
     int pos = _markers.indexWhere((m) => m.markerId == marker!.markerId);
     setState(() {
       _markers[pos].captionText = '선택됨';
+      //_markers[pos].infoWindow = "aa";
     });
     if (_currentMode == MODE_REMOVE) {
       setState(() {
         _markers.removeWhere((m) => m.markerId == marker!.markerId);
+      });
+    }
+    if (_currentMode == MODE_MODIFY) {
+      setState(() {
+        _markers[pos].infoWindow = _textMap.text;
       });
     }
   }
