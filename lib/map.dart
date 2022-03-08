@@ -1,10 +1,12 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, import_of_legacy_library_into_null_safe, avoid_print
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, import_of_legacy_library_into_null_safe, avoid_print, unused_local_variable, unnecessary_new
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:naver_map_plugin/naver_map_plugin.dart';
 
 import 'dart:async';
+import 'package:flutter/material.dart';
 
 class Map3 extends StatefulWidget {
   const Map3({Key? key}) : super(key: key);
@@ -19,12 +21,15 @@ class _MapState extends State<Map3> {
   static const MODE_REMOVE = 0xF2;
   static const MODE_NONE = 0xF3;
   static const MODE_MODIFY = 0xF4;
+  static const MODE_DISTANCE = 0xF5;
   int _currentMode = MODE_NONE;
+  static String sDis = "KM";
 
   final _textMap = TextEditingController();
 
   Completer<NaverMapController> _controller = Completer();
   List<Marker> _markers = [];
+  List<Marker> _markers2 = [];
 
   @override
   void dispose() {
@@ -69,6 +74,9 @@ class _MapState extends State<Map3> {
         ),
         body: Column(
           children: <Widget>[
+            CircleAvatar(
+              child: Text(sDis),
+            ),
             _naverMap(),
             _controlPanel(),
             _textFieldView(),
@@ -137,7 +145,7 @@ class _MapState extends State<Map3> {
               ),
             ),
           ),
-
+          //수정
           Expanded(
             child: GestureDetector(
               onTap: () => setState(() => _currentMode = MODE_MODIFY),
@@ -155,6 +163,38 @@ class _MapState extends State<Map3> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: _currentMode == MODE_MODIFY
+                        ? Colors.white
+                        : Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _currentMode = MODE_DISTANCE;
+                });
+              },
+              //onTap: () => setState(() => _currentMode = MODE_DISTANCE),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: _currentMode == MODE_DISTANCE
+                        ? Colors.black
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.black)),
+                padding: EdgeInsets.all(8),
+                margin: EdgeInsets.only(right: 8),
+                child: Text(
+                  '거리계산',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _currentMode == MODE_DISTANCE
                         ? Colors.white
                         : Colors.black,
                     fontWeight: FontWeight.w600,
@@ -233,6 +273,15 @@ class _MapState extends State<Map3> {
       ));
       setState(() {});
     }
+    if (_currentMode == MODE_DISTANCE) {
+      _markers.add(Marker(
+        markerId: DateTime.now().toIso8601String(),
+        position: latLng,
+        infoWindow: "거리 계산하자",
+        onMarkerTab: _onMarkerTap,
+      ));
+      setState(() {});
+    }
   }
 
   void _onMapCreated(NaverMapController controller) {
@@ -244,9 +293,9 @@ class _MapState extends State<Map3> {
 
   void _onMarkerTap(Marker? marker, Map<String, int?> dd) {
     int pos = _markers.indexWhere((m) => m.markerId == marker!.markerId);
+    int pos2 = _markers.lastIndexWhere((m) => m.markerId == marker!.markerId);
     setState(() {
       _markers[pos].captionText = '선택됨';
-      //_markers[pos].infoWindow = "aa";
     });
     if (_currentMode == MODE_REMOVE) {
       setState(() {
@@ -256,6 +305,22 @@ class _MapState extends State<Map3> {
     if (_currentMode == MODE_MODIFY) {
       setState(() {
         _markers[pos].infoWindow = _textMap.text;
+      });
+    }
+    if (_currentMode == MODE_DISTANCE) {
+      setState(() {
+        _markers[pos2].captionText = '두번째';
+
+        var dis1 = _markers[pos].position;
+        var dis2 = _markers[pos2].position;
+
+        List<LatLng?> _coordinates = [dis1, dis2];
+        sDis = _coordinates.length.toString();
+      });
+    }
+    if (_currentMode == MODE_NONE) {
+      setState(() {
+        //_markers.clear();
       });
     }
   }
