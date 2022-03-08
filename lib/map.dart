@@ -1,12 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, import_of_legacy_library_into_null_safe, avoid_print, unused_local_variable, unnecessary_new
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:naver_map_plugin/naver_map_plugin.dart';
-
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'distance1.dart';
 
 class Map3 extends StatefulWidget {
   const Map3({Key? key}) : super(key: key);
@@ -44,12 +41,26 @@ class _MapState extends State<Map3> {
         assetName: 'icon/marker.png',
       ).then((image) {
         setState(() {
-          print("test1");
+          print("#test1");
           _markers.add(Marker(
               markerId: 'id',
               position: LatLng(37.489488, 126.724519),
               captionText: "커스텀 아이콘",
               captionColor: Colors.indigo,
+              captionTextSize: 20.0,
+              alpha: 0.8,
+              captionOffset: 30,
+              icon: image,
+              anchor: AnchorPoint(0.5, 1),
+              width: 45,
+              height: 45,
+              infoWindow: '인포 윈도우',
+              onMarkerTab: _onMarkerTap));
+          _markers2.add(Marker(
+              markerId: 'id2',
+              position: LatLng(37.489488, 126.724519),
+              captionText: "커스텀 아이콘",
+              captionColor: Colors.red,
               captionTextSize: 20.0,
               alpha: 0.8,
               captionOffset: 30,
@@ -293,10 +304,11 @@ class _MapState extends State<Map3> {
 
   void _onMarkerTap(Marker? marker, Map<String, int?> dd) {
     int pos = _markers.indexWhere((m) => m.markerId == marker!.markerId);
-    int pos2 = _markers.lastIndexWhere((m) => m.markerId == marker!.markerId);
-    setState(() {
-      _markers[pos].captionText = '선택됨';
-    });
+    var dis1 = LatLng(37.489488, 126.724519);
+    var dis2 = LatLng(37.489488, 126.724519);
+
+    print("# 1 : " + pos.toString());
+    setState(() {});
     if (_currentMode == MODE_REMOVE) {
       setState(() {
         _markers.removeWhere((m) => m.markerId == marker!.markerId);
@@ -309,17 +321,18 @@ class _MapState extends State<Map3> {
     }
     if (_currentMode == MODE_DISTANCE) {
       setState(() {
-        _markers[pos2].captionText = '두번째';
-
-        var dis1 = _markers[pos].position;
-        var dis2 = _markers[pos2].position;
-
-        List<LatLng?> _coordinates = [dis1, dis2];
-        sDis = _coordinates.length.toString();
+        pos = _markers.indexWhere((m) => m.markerId == marker!.markerId);
+        _markers[pos].captionText = '두번째';
+        dis2 = _markers[pos].position!;
+        print("# dis2 : " + dis2.toString());
+        print(DistanceDouble(dis1_: dis1, dis2_: dis1).disfunction());
       });
     }
     if (_currentMode == MODE_NONE) {
       setState(() {
+        _markers[pos].captionText = '선택됨';
+        dis1 = _markers[pos].position!;
+        print("# dis1 : " + dis1.toString());
         //_markers.clear();
       });
     }
