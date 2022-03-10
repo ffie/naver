@@ -45,11 +45,11 @@ double distance_(LatLng dis1_, LatLng dis2_) {
   print("# : c2 : " + c2.toString());
   print("# : e2 : " + e2.toString());
 
-  double x1 = c as double;
-  double y1 = e as double;
+  double x1 = double.parse(c);
+  double y1 = double.parse(e);
 
-  double x2 = c2 as double;
-  double y2 = e2 as double;
+  double x2 = double.parse(c2);
+  double y2 = double.parse(e2);
 
   print("# x1 : " + x1.toString());
   print("# y1 : " + y1.toString());
@@ -64,5 +64,7 @@ double distance_(LatLng dis1_, LatLng dis2_) {
   km = (x * x + y * y) * sqrt1_2;
   print("# km : " + km.toString());
 
+  String s = (km / 100).toStringAsFixed(2);
+  km = double.parse(s);
   return km;
 }
