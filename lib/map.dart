@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:naver_map_plugin/naver_map_plugin.dart';
 import 'dart:async';
 import 'distance1.dart';
+import 'package:flutter/cupertino.dart';
 
 class Map3 extends StatefulWidget {
   const Map3({Key? key}) : super(key: key);
@@ -324,8 +325,12 @@ class _MapState extends State<Map3> {
         pos = _markers.indexWhere((m) => m.markerId == marker!.markerId);
         _markers[pos].captionText = '두번째';
         dis2 = _markers[pos].position!;
-        print("# dis2 : " + dis2.toString());
-        print(DistanceDouble(dis1_: dis1, dis2_: dis1).disfunction());
+
+        List<LatLng> _coordinates = [dis1, dis2];
+
+        sDis =
+            DistanceDouble(dis1_: dis1, dis2_: dis2).disfunction().toString();
+        print("# nDis = " + sDis);
       });
     }
     if (_currentMode == MODE_NONE) {
